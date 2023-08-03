@@ -9,6 +9,8 @@ import lombok.Value;
 
 import java.util.Locale;
 
+import static io.restassured.RestAssured.given;
+
 public class DataGenerator {
     private static final RequestSpecification requestSpec = new RequestSpecBuilder()
             .setBaseUri("http://localhost")
@@ -26,6 +28,15 @@ public class DataGenerator {
         // TODO: отправить запрос на указанный в требованиях path, передав в body запроса объект user
         //  и не забудьте передать подготовленную спецификацию requestSpec.
         //  Пример реализации метода показан в условии к задаче.
+
+        given()
+                .spec(requestSpec)
+                .body(user)
+        .when()
+                .post("/api/system/users")
+        .then()
+                .statusCode(200);
+
     }
 
     public static String getRandomLogin() {
@@ -42,14 +53,22 @@ public class DataGenerator {
         private Registration() {
         }
 
+
         public static RegistrationDto getUser(String status) {
             // TODO: создать пользователя user используя методы getRandomLogin(), getRandomPassword() и параметр status
+            var user = new RegistrationDto(
+                getRandomLogin(),
+                getRandomPassword(),
+                status
+        );
             return user;
         }
 
         public static RegistrationDto getRegisteredUser(String status) {
             // TODO: объявить переменную registeredUser и присвоить ей значение возвращённое getUser(status).
             // Послать запрос на регистрацию пользователя с помощью вызова sendRequest(registeredUser)
+            var registeredUser = getUser(status);
+            sendRequest(registeredUser);
             return registeredUser;
         }
     }
